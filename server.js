@@ -1,8 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt-nodejs')
+const cors = require('cors');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 
 const database = {
     users: [
@@ -30,9 +33,9 @@ app.get('/', (req, res) => {
 })
 
 app.post('/signin', (req, res) => {
-    if(req.body.email === database.users[0].email && req.body.password === database.users[0].password) {
-        res.json('successfully signed up!');
-    } else{
+    if (req.body.email === database.users[0].email && req.body.password === database.users[0].password) {
+        res.json('success');
+    } else {
         res.status(400).json('error login in')
     }
 })
@@ -57,3 +60,47 @@ app.listen(3000, () => {
     console.log('Server started on port 3000');
 })
 
+app.get('/profile/:id', (req, res) => {
+    const {id} = req.params;
+    let found = false;
+    database.users.forEach((user) => {
+        if (user.id === id) {
+            found = true;
+            return res.json(user);
+        }
+    })
+    if (!found) {
+        res.status(404).json('user not found');
+    }
+})
+app.put('/image', (req, res) => {
+    const {id} = req.body;
+    let found = false;
+    database.users.forEach((user) => {
+        if (user.id === id) {
+            found = true;
+            user.entries ++;
+            return res.json(user.entries);
+        }
+    })
+    if (!found) {
+        res.status(404).json('user not found');
+    }
+})
+
+var hash = bcrypt.hashSync("bacon");
+
+bcrypt.compareSync("bacon", hash); // true
+bcrypt.compareSync("veggies", hash); // false
+
+bcrypt.hash("bacon", null, null, function(err, hash) {
+    // Store hash in your password DB.
+});
+
+// Load hash from your password DB.
+bcrypt.compare("bacon", hash, function(err, res) {
+    // res == true
+});
+bcrypt.compare("veggies", hash, function(err, res) {
+    // res = false
+});
