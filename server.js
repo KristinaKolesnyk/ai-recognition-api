@@ -2,6 +2,19 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt-nodejs')
 const cors = require('cors');
+const knex = require('knex')
+
+const postgres = knex({
+    client: 'pg',
+    connection: {
+        host: '127.0.0.1',
+        user: '',
+        password: '',
+        database: 'smart-brain',
+    },
+});
+
+console.log(postgres.select('*').from('users'));
 
 const app = express();
 app.use(bodyParser.json());
@@ -78,7 +91,7 @@ app.put('/image', (req, res) => {
     database.users.forEach((user) => {
         if (user.id === id) {
             found = true;
-            user.entries ++;
+            user.entries++;
             return res.json(user.entries);
         }
     })
@@ -92,14 +105,14 @@ var hash = bcrypt.hashSync("bacon");
 bcrypt.compareSync("bacon", hash); // true
 bcrypt.compareSync("veggies", hash); // false
 
-bcrypt.hash("bacon", null, null, function(err, hash) {
+bcrypt.hash("bacon", null, null, function (err, hash) {
     // Store hash in your password DB.
 });
 
 // Load hash from your password DB.
-bcrypt.compare("bacon", hash, function(err, res) {
+bcrypt.compare("bacon", hash, function (err, res) {
     // res == true
 });
-bcrypt.compare("veggies", hash, function(err, res) {
+bcrypt.compare("veggies", hash, function (err, res) {
     // res = false
 });
